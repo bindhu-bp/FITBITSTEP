@@ -102,13 +102,13 @@ functions:
           method: GET
           cors: true
 
-  # getSteps:
-  #   handler: handler.handler
-  #   events:
-  #     - http:
-  #         path: /fitbit/fetchSteps
-  #         method: GET
-  #         cors: true
+  getSteps:
+    handler: handler.handler
+    events:
+      - http:
+          path: /fitbit/fetchSteps
+          method: GET
+          cors: true
 
 plugins:
   - serverless-python-requirements
