@@ -70,28 +70,33 @@ async def fitbit_callback(code: str, state: str):
     if not state:
         raise HTTPException(status_code=400, detail="State parameter is missing.")
 
-    # Extract user_id from the 'state' parameter
-    user_id = int(state)
-
-    payload = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'code': code,
-        'redirect_uri': REDIRECT_URI,
-        'grant_type': 'authorization_code',
-    }
-
-    headers = {
-        'Authorization': f'Basic {encoded_credentials}'
-    }
+    # Log the state and code received
+    logger.debug(f"Received code: {code}, state: {state}")
 
     try:
+        # Extract user_id from the 'state' parameter
+        user_id = int(state)
+        logger.debug(f"Parsed user_id: {user_id}")
+
+        client_credentials = f"{CLIENT_ID}:{CLIENT_SECRET}"
+        encoded_credentials = base64.b64encode(client_credentials.encode()).decode("utf-8")
+
+        payload = {
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': REDIRECT_URI,
+            'grant_type': 'authorization_code',
+        }
+
+        headers = {
+            'Authorization': f'Basic {encoded_credentials}'
+        }
+
         # Logging the request to Fitbit
         logger.debug(f"Requesting Fitbit token with code {code} for user {user_id}")
 
         response = requests.post(TOKEN_URL, data=payload, headers=headers)
-
-        # Log the response from Fitbit
         logger.debug(f"Fitbit response status code: {response.status_code}")
         logger.debug(f"Fitbit response body: {response.text}")
 
@@ -127,5 +132,5 @@ async def fitbit_callback(code: str, state: str):
         return {"message": f"Fitbit connected successfully for user {user_id}"}
 
     except Exception as e:
-        logger.error(f"Error storing Fitbit token for user {user_id}: {str(e)}")
+        logger.error(f"Error in Fitbit callback: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error storing Fitbit token: {str(e)}")
