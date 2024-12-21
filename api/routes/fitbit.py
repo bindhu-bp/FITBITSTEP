@@ -7,6 +7,7 @@ import os
 import requests
 import logging
 from dotenv import load_dotenv
+from urllib.parse import urlencode
 
 router = APIRouter()
 
@@ -23,32 +24,54 @@ TOKEN_URL = os.getenv("FITBIT_TOKEN_URL")
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# @router.get("/fitbit/connect")
+# async def connect_to_fitbit(user_id: int):
+#     """
+#     Initiates the Fitbit OAuth connection process using user_id.
+#     """
+#     if not user_id:
+#         raise HTTPException(status_code=400, detail="user_id query parameter is required.")
+    
+#     authorization_url = f"https://www.fitbit.com/oauth2/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=activity&user_id={user_id}"
+#     logger.debug(f"Redirecting user {user_id} to Fitbit OAuth page: {authorization_url}")
+#     return RedirectResponse(url=authorization_url)
 @router.get("/fitbit/connect")
 async def connect_to_fitbit(user_id: int):
     """
     Initiates the Fitbit OAuth connection process using user_id.
     """
-    print("user_id", user_id)   
-
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id query parameter is required.")
-    
-    authorization_url = f"https://www.fitbit.com/oauth2/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=activity"
-    
+
+    # Parameters to be included in the authorization URL
+    params = {
+        'response_type': 'code',
+        'client_id': CLIENT_ID,
+        'redirect_uri': REDIRECT_URI,
+        'scope': 'activity',
+        'state': str(user_id)  # Pass user_id via the state parameter
+    }
+
+    # Encode parameters correctly
+    authorization_url = f"https://www.fitbit.com/oauth2/authorize?{urlencode(params)}"
+
+    print(authorization_url)
     logger.debug(f"Redirecting user {user_id} to Fitbit OAuth page: {authorization_url}")
     return RedirectResponse(url=authorization_url)
 
 @router.get("/fitbit/callback")
-async def fitbit_callback(code: str, user_id: int):
+async def fitbit_callback(code: str, state: str):
     """
     Callback endpoint for Fitbit OAuth.
     Exchanges the authorization code for an access token and stores it in the database.
     """
     if not code:
         raise HTTPException(status_code=400, detail="Authorization code is required.")
-    
-    client_credentials = f"{CLIENT_ID}:{CLIENT_SECRET}"
-    encoded_credentials = base64.b64encode(client_credentials.encode()).decode("utf-8")
+    if not state:
+        raise HTTPException(status_code=400, detail="State parameter is missing.")
+
+    # Extract user_id from the 'state' parameter
+    user_id = int(state)
 
     payload = {
         'client_id': CLIENT_ID,

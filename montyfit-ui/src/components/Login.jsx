@@ -18,8 +18,8 @@ const Login = ({ onLogin }) => {
         }
       );
       if (response.data.message === "valid") {
-        const { user_id } = response.data.user_id; // Assuming user_id is part of the response
-        onLogin(loginEmail, user_id); // Pass both email and user_id to parent
+        const userId = response.data.user_id; // Assuming `user_id` is part of the response
+        onLogin(loginEmail, userId); // Pass both email and user_id to parent
         localStorage.setItem("user_id", user_id);
       } else if (response.data.message === "invalid") {
         setErrorMessage("Account does not exist. Click on Signup.");

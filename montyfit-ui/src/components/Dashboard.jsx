@@ -7,12 +7,10 @@ import Stepcount from "./Stepcount.jsx";
 import Title from "./Title.jsx";
 
 const Dashboard = ({ email, userId, onLogout }) => {
-  // Accept userId as a prop
   return (
     <div className={styles.dashboard}>
       <Title />
-      <Profile userEmail={email} userId={userId} onLogout={onLogout} />{" "}
-      {/* Pass userId to Profile */}
+      <Profile userEmail={email} userId={userId} onLogout={onLogout} />
       <div className={styles.mainContent}>
         <Stepcount userEmail={email} />
         <Charts userEmail={email} />
