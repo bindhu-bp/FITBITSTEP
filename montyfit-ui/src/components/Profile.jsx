@@ -3,7 +3,7 @@ import styles from "./Dashboard.module.css";
 import { getUserProfile, updateUserProfile } from "../services/profileService"; // Import the service file
 import ConnectFitbit from "./ConnectFitbit";
 
-export default function Profile({ userEmail, onLogout }) {
+export default function Profile({ userEmail, onLogout, userId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
@@ -165,7 +165,7 @@ export default function Profile({ userEmail, onLogout }) {
         <button className={styles.logoutButton} onClick={handleSaveClick}>
           {isEditing ? "Save" : "Logout"}
         </button>
-        <ConnectFitbit />
+        <ConnectFitbit userId={userId} />
       </div>
     </>
   );

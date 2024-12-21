@@ -86,18 +86,29 @@ functions:
           method: POST
           cors: true
 
-  connectFitbit:
+  fitbitConnect:
     handler: handler.handler
     events:
       - http:
           path: /fitbit/connect
-          method: get
+          method: GET
+          cors: true
+
+  fitbitCallback:
+    handler: handler.handler
+    events:
       - http:
           path: /fitbit/callback
-          method: get
-      - http:
-          path: /fitbit/fetchSteps
-          method: get
+          method: GET
+          cors: true
+
+  # getSteps:
+  #   handler: handler.handler
+  #   events:
+  #     - http:
+  #         path: /fitbit/fetchSteps
+  #         method: GET
+  #         cors: true
 
 plugins:
   - serverless-python-requirements

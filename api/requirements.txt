@@ -5,4 +5,5 @@ python-dotenv==0.21.0
 boto3==1.26.90
 requests==2.31.0
 pyjwt==2.7.0
+requests
 

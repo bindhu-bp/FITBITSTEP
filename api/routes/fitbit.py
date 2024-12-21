@@ -28,6 +28,8 @@ async def connect_to_fitbit(user_id: int):
     """
     Initiates the Fitbit OAuth connection process using user_id.
     """
+    print("user_id", user_id)   
+
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id query parameter is required.")
     
@@ -104,82 +106,3 @@ async def fitbit_callback(code: str, user_id: int):
     except Exception as e:
         logger.error(f"Error storing Fitbit token for user {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error storing Fitbit token: {str(e)}")
-
-
-@router.get("/fitbit/fetchSteps")
-async def fetch_steps(user_id: int):
-    """
-    Fetches Fitbit step data for the given user and stores it in the database.
-    """
-    try:
-        # Logging the start of fetching steps for the user
-        logger.debug(f"Fetching Fitbit step data for user {user_id}")
-
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        cursor.execute("SELECT fitbit_token FROM users WHERE user_id = %s", (user_id,))
-        result = cursor.fetchone()
-
-        if not result:
-            logger.error(f"Fitbit token not found for user {user_id}")
-            raise HTTPException(status_code=404, detail="Fitbit token not found for user")
-
-        access_token = result[0]
-
-        # Log the retrieved access token
-        logger.debug(f"Fetched Fitbit token for user {user_id}")
-
-        cursor.close()
-        connection.close()
-
-        FITBIT_STEP_URL = "https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json"
-        headers = {'Authorization': f'Bearer {access_token}'}
-
-        response = requests.get(FITBIT_STEP_URL, headers=headers)
-
-        # Log the response from Fitbit
-        logger.debug(f"Fitbit response status code: {response.status_code}")
-        logger.debug(f"Fitbit response body: {response.text}")
-
-        if response.status_code != 200:
-            logger.error(f"Error fetching step data: {response.text}")
-            raise HTTPException(status_code=400, detail="Error fetching step data")
-
-        step_data = response.json()
-        steps = step_data['activities-steps'][0]['value']
-
-        # Log the steps data received
-        logger.debug(f"Fetched {steps} steps for user {user_id}")
-
-        # Database interaction for storing step data
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        cursor.execute("""
-            SELECT * FROM stepcount WHERE user_id = %s AND date = CURRENT_DATE
-        """, (user_id,))
-        existing_record = cursor.fetchone()
-
-        if existing_record:
-            # Update the step count for today
-            cursor.execute("""
-                UPDATE stepcount SET stepcount = %s WHERE user_id = %s AND date = CURRENT_DATE
-            """, (steps, user_id))
-        else:
-            # Insert new record for today's steps
-            cursor.execute("""
-                INSERT INTO stepcount (user_id, stepcount, date, source)
-                VALUES (%s, %s, CURRENT_DATE, 'fitbit')
-            """, (user_id, steps))
-
-        connection.commit()
-        cursor.close()
-        connection.close()
-
-        logger.info(f"Step data for user {user_id}: {steps} steps today stored successfully.")
-        return {"message": f"Step data fetched and stored successfully: {steps} steps today!"}
-
-    except Exception as e:
-        logger.error(f"Error storing step data for user {user_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error storing step data: {str(e)}")
