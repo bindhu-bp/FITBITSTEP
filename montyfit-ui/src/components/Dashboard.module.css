@@ -1,0 +1,362 @@
+body {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Lato";
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+}
+
+.titleBox {
+  width: 25%;
+  border-radius: 15px;
+  background-color: white;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-image: url("../../public/mclogo.jpg");
+  background-repeat: no-repeat;
+  background-position: 20px;
+  background-size: 50px 50px;
+}
+
+.title {
+  text-align: center;
+  font-size: 2em;
+  margin: 0;
+  color: #000;
+  font-family: "Noto Sans Japanese";
+}
+
+.sidebar {
+  width: 25%;
+  height: 84vh; /* Adjusted height to fit below titleBox */
+  border-radius: 15px;
+  background-color: white;
+  position: fixed;
+  top: 110px; /* Adjusted top to fit below titleBox */
+  left: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  color: #000;
+  margin: 0;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.editIcon {
+  position: absolute;
+  top: 10px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  width: 24px; /* Adjust icon width */
+  height: 24px; /* Adjust icon height */
+  fill: #000; /* Adjust icon color */
+  cursor: pointer;
+}
+
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative; /* Added for positioning plus icon */
+}
+
+.profilePhoto {
+  width: 220px;
+  height: 220px;
+  background-color: #ddd;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative; /* Added for positioning plus icon */
+}
+
+.profilePhoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.fileInput {
+  display: none;
+}
+
+.plusIcon {
+  position: absolute;
+  top: 160px;
+  right: 110px;
+  font-size: 20px;
+  color: black;
+  background-color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userInfo h2 {
+  margin: 0 0 10px 0;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.userInfo {
+  text-align: center;
+  font-size: 15px;
+}
+
+.details p {
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px 0;
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.logoutButton {
+  padding: 10px 20px;
+  background-color: white;
+  width: 100%;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.4s ease;
+}
+
+.logoutButton:hover {
+  background-color: #4281e4;
+}
+
+.inputField {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid black;
+  color: #000;
+  border-radius: 5px;
+  width: 80%;
+  background-color: #fff;
+}
+
+.mainContent {
+  margin-left: 27vw;
+  padding-top: 10px;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 75%;
+}
+
+.stepcount {
+  display: flex;
+  gap: 10px;
+}
+
+.stepUpdate {
+  display: flex;
+  background-color: #fff;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.stepUpdate h4 {
+  margin: 0;
+  padding-left: 10px;
+  color: black;
+  text-align: left;
+}
+
+.stepUpdate input[type="number"],
+.stepUpdate input[type="date"] {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #000;
+  width: 230px;
+  height: 40px;
+  font-weight: 500;
+}
+
+.stepUpdate button {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  width: 305px;
+  height: 50px;
+  background-color: #f79824;
+  transition: background-color 0.4s ease;
+  font-weight: 700;
+}
+
+/* .stepUpdate button:hover {
+  background-color: #98fb98;
+} */
+
+.stepUpdate .dateInputContainer {
+  display: flex;
+  align-items: center;
+}
+
+.stepUpdate .dateInput {
+  padding: 8px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #000;
+  width: 50px;
+  /* background-image: url("../../public/calender.png"); */
+  background-repeat: no-repeat;
+  background-position: 220px;
+  background-size: 20px 20px;
+  padding-right: 30px;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statItems {
+  display: flex;
+  flex-direction: row;
+}
+
+.statItem {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  flex: 1;
+  margin: 0 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 375px;
+}
+
+.statItem p {
+  margin: 0;
+  color: black;
+  font-size: 18px;
+  text-align: left;
+}
+
+.statItem p:last-child {
+  font-size: 3.5em;
+  text-align: center;
+  font-weight: 700;
+  color: black;
+}
+
+.charts {
+  display: flex;
+  gap: 20px;
+  height: 300px;
+  width: 100%;
+}
+
+.chart {
+  background-color: #fff;
+  border-radius: 15px;
+  color: #fff;
+  max-height: 300px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 650px; /* Changed to 500px */
+}
+
+.rankTable {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 0;
+  width: 1320px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard {
+  color: black;
+  text-align: left;
+  font-size: 20px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding: 10px 0;
+  margin: 0;
+  z-index: 2;
+}
+
+.tableContainer {
+  max-height: 330px;
+  overflow-y: auto;
+  border-color: #000;
+}
+
+.rankTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankTable th,
+.rankTable td {
+  padding: 10px;
+  text-align: left;
+  color: black;
+}
+
+.rankTable th {
+  padding: 10px;
+  text-align: left;
+  color: black;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
+}
+
+.tablenav {
+  display: flex;
+  gap: 70%;
+}
+
+.leaderboardbuttons {
+  display: flex;
+  gap: 10px;
+}
+
+.daily,
+.weekly {
+  background-color: white;
+  color: #000;
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+}
+
+.daily.hover,
+.weekly.hover {
+  border-color: blue;
+}

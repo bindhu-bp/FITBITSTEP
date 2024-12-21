@@ -1,0 +1,110 @@
+service: FitbitFastAPI
+
+provider:
+  name: aws
+  runtime: python3.12
+  environment:
+    SECRET_KEY: ${env:SECRET_KEY}
+
+functions:
+  loginFunction:
+    handler: handler.handler # Assuming your FastAPI app is in handler.py file.
+    events:
+      - http:
+          path: /login
+          method: POST
+          cors: true
+
+  signupFunction:
+    handler: handler.handler # Add your signup function here similarly.
+    events:
+      - http:
+          path: /signup
+          method: POST
+          cors: true
+
+  updateStepCountFunction:
+    handler: handler.handler # Add the updateStepCount function here.
+    events:
+      - http:
+          path: /updateStepCount
+          method: POST
+          cors: true
+
+  getUserProfileFunction:
+    handler: handler.handler # Add the getUserProfile function here.
+    events:
+      - http:
+          path: /getUserProfile
+          method: POST
+          cors: true
+
+  updateUserProfileFunction:
+    handler: handler.handler # Add the updateUserProfile function here.
+    events:
+      - http:
+          path: /updateUserProfile
+          method: POST
+          cors: true
+
+  leaderboardDailyFunction:
+    handler: handler.handler # Add the leaderboardDaily function here.
+    events:
+      - http:
+          path: /leaderboardDaily
+          method: GET
+          cors: true
+
+  leaderboardWeeklyFunction:
+    handler: handler.handler # Add the leaderboardWeekly function here.
+    events:
+      - http:
+          path: /leaderboardWeekly
+          method: GET
+          cors: true
+
+  dashboardFunction:
+    handler: handler.handler # Add the dashboard function here.
+    events:
+      - http:
+          path: /dashboard
+          method: GET
+          cors: true
+  buttonAverageFunction:
+    handler: handler.handler # Assuming your FastAPI app is in handler.py
+    events:
+      - http:
+          path: /buttonAverage
+          method: POST
+          cors: true
+
+  buttonTotalFunction:
+    handler: handler.handler # Assuming your FastAPI app is in handler.py
+    events:
+      - http:
+          path: /buttonTotal
+          method: POST
+          cors: true
+
+  connectFitbit:
+    handler: handler.handler
+    events:
+      - http:
+          path: /fitbit/connect
+          method: get
+      - http:
+          path: /fitbit/callback
+          method: get
+      - http:
+          path: /fitbit/fetchSteps
+          method: get
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+  package:
+    exclude:
+      - node_modules/**
