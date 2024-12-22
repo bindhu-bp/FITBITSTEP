@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Login = ({ onLogin }) => {
   const [loginEmail, setLoginEmail] = useState("");
@@ -21,13 +22,17 @@ const Login = ({ onLogin }) => {
         const userId = response.data.user_id; // Assuming `user_id` is part of the response
         onLogin(loginEmail, userId); // Pass both email and user_id to parent
         localStorage.setItem("user_id", user_id);
+
       } else if (response.data.message === "invalid") {
         setErrorMessage("Account does not exist. Click on Signup.");
+        toast.error("Account does not exist. Click on Signup.");
       } else {
         setErrorMessage(response.data.message);
+        toast.error("Error while logging in");
       }
     } catch (error) {
       setErrorMessage(error.message);
+      toast.error("Error while logging in");
     }
   };
 

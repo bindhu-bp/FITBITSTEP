@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const [signUpName, setSignUpName] = useState("");
@@ -10,6 +11,7 @@ const Signup = () => {
   const [signUpPassword, setSignUpPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -26,9 +28,11 @@ const Signup = () => {
           }
         );
         if (response.data.message === "valid") {
-          alert("User Account Created Successfully. Click on Sign in here.");
+          toast.success("User Account Created Successfully. Click on Sign in here.");
+          navigate("/login");
         } else if (response.data.message === "invalid") {
           setErrorMessage("Error while creating Account");
+          toast.error("Error while creating Account");
         } else {
           setErrorMessage(response.data.message);
         }
@@ -37,6 +41,7 @@ const Signup = () => {
       }
     } else {
       setErrorMessage("Password do not match.");
+      toast.error("Password do not match.");
     }
   };
 

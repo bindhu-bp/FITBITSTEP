@@ -15,6 +15,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-google-charts": "^4.0.1",
+    "react-hot-toast": "^2.4.1",
     "react-router": "^6.23.1",
     "react-router-dom": "^6.23.1"
   },
@@ -30,5 +31,6 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "vite": "^5.3.1"
-  }
+  },
+  "packageManager": "yarn@4.1.1+sha512.ec40d0639bb307441b945d9467139cbb88d14394baac760b52eca038b330d16542d66fef61574271534ace5a200518dabf3b53a85f1f9e4bfa37141b538a9590"
 }
