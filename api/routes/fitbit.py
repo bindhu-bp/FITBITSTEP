@@ -8,6 +8,7 @@ import requests
 import logging
 from dotenv import load_dotenv
 from urllib.parse import urlencode
+import datetime
 
 router = APIRouter()
 
@@ -27,12 +28,10 @@ logger = logging.getLogger(__name__)
 # Route for connecting to Fitbit
 @router.get("/fitbit/connect")
 async def connect_to_fitbit(user_id: int):
-    """
-    Initiates the Fitbit OAuth connection process using user_id.
-    """
+    """ Initiates the Fitbit OAuth connection process using user_id. """
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id query parameter is required.")
-
+    
     # Parameters to be included in the authorization URL
     params = {
         'response_type': 'code',
@@ -41,19 +40,19 @@ async def connect_to_fitbit(user_id: int):
         'scope': 'activity',
         'state': str(user_id)  # Pass user_id via the state parameter
     }
-
+    
     # Encode parameters correctly
     authorization_url = f"https://www.fitbit.com/oauth2/authorize?{urlencode(params)}"
-
     logger.debug(f"Redirecting user {user_id} to Fitbit OAuth page: {authorization_url}")
+    
     return RedirectResponse(url=authorization_url)
 
-# Route for Fitbit callback and token exchange
 @router.get("/fitbit/callback")
 async def fitbit_callback(code: str, state: str):
     """
     Callback endpoint for Fitbit OAuth.
-    Exchanges the authorization code for an access token and stores it in the database.
+    Exchanges the authorization code for an access token, stores it in the database,
+    and fetches Fitbit steps.
     """
     if not code:
         raise HTTPException(status_code=400, detail="Authorization code is required.")
@@ -92,7 +91,7 @@ async def fitbit_callback(code: str, state: str):
         if not access_token or not refresh_token:
             raise HTTPException(status_code=400, detail="Failed to retrieve tokens")
 
-        # Database interaction
+        # Store tokens in the database
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -108,118 +107,85 @@ async def fitbit_callback(code: str, state: str):
         """, (access_token, refresh_token, user_id))
 
         connection.commit()
+
+        print(f"Fitbit connected successfully for user {user_id}")
+        logger.info(f"Fitbit connected successfully for user {user_id}")
+
+        # Fetch and store Fitbit steps
+        fetch_response = await fetch_fitbit_steps(user_id)
+
+        print(f"Fetched steps for user {user_id}: {fetch_response}")
+        logger.info(f"Fetched steps for user {user_id}: {fetch_response}")
+
         cursor.close()
         connection.close()
 
-        logger.info(f"Fitbit connected successfully for user {user_id}")
-        return RedirectResponse(url=f"/fitbit/fetchSteps?user_id={user_id}")
+        return {"message": "Fitbit connected and steps fetched successfully.", "steps": fetch_response}
 
     except Exception as e:
         logger.error(f"Error in Fitbit callback: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error storing Fitbit token: {str(e)}")
 
-# Route for fetching steps data
+# Route to fetch Fitbit steps and store in the database
 @router.get("/fitbit/fetchSteps")
-async def get_steps(user_id: int):
+async def fetch_fitbit_steps(user_id: int):
     """
-    Fetches the step count from Fitbit for the given user.
+    Fetches Fitbit step data for the given user_id and stores it in the stepcount table.
     """
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id query parameter is required.")
+
     try:
-        # Fetch the access token from the database
+        # Database interaction to get tokens
         connection = get_db_connection()
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT fitbit_token, fitbit_refresh_token FROM users WHERE user_id = %s", (user_id,))
-            user = cursor.fetchone()
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-            if not user or not user[0]:
-                raise HTTPException(status_code=400, detail="Fitbit token not found")
+        cursor.execute("SELECT fitbit_token FROM users WHERE user_id = %s", (user_id,))
+        user = cursor.fetchone()
 
-            access_token = user[0]
-            refresh_token = user[1]
+        if not user or not user["fitbit_token"]:
+            raise HTTPException(status_code=404, detail="Fitbit is not connected for this user.")
 
-            # Check if the access token is expired
-            if not is_token_valid(access_token):
-                access_token = await refresh_access_token(refresh_token)
+        access_token = user["fitbit_token"]
 
-                # Update the new access token in the database
-                cursor.execute("UPDATE users SET fitbit_token = %s WHERE user_id = %s", (access_token, user_id))
-                connection.commit()
+        # Fitbit API request to fetch step data
+        headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
 
-            # Make a request to Fitbit API to fetch the steps data
-            headers = {
-                'Authorization': f'Bearer {access_token}'
-            }
-            fitbit_url = f'https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json'
-            fitbit_response = requests.get(fitbit_url, headers=headers)
+        # Endpoint for Fitbit steps data (example for daily activity steps)
+        fitbit_url = "https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json"
+        response = requests.get(fitbit_url, headers=headers)
 
-            if fitbit_response.status_code != 200:
-                raise HTTPException(status_code=500, detail="Error fetching steps data from Fitbit")
+        if response.status_code != 200:
+            logger.error(f"Error fetching steps data: {response.text}")
+            raise HTTPException(status_code=400, detail="Error fetching Fitbit steps data")
 
-            steps_data = fitbit_response.json()
-            steps = steps_data['activities-steps'][0]['value']  # Get steps value for today
+        steps_data = response.json()
 
-            # Store or update the steps data in the database
-            cursor.execute("SELECT * FROM stepcount WHERE user_id = %s AND date = CURDATE()", (user_id,))
-            existing_record = cursor.fetchone()
+        # Extracting step count from response
+        steps = steps_data.get("activities-steps", [{}])[-1].get("value")
+        if not steps:
+            raise HTTPException(status_code=404, detail="No steps data available.")
 
-            if existing_record:
-                # Update the existing record with the new step count for today
-                cursor.execute(""" 
-                    UPDATE stepcount 
-                    SET steps = %s, source = 'Fitbit'
-                    WHERE user_id = %s AND date = CURDATE()
-                """, (steps, user_id))
-            else:
-                # Insert a new record for today's step count if no data exists
-                cursor.execute(""" 
-                    INSERT INTO stepcount (user_id, steps, date, source) 
-                    VALUES (%s, %s, CURDATE(), 'Fitbit')
-                """, (user_id, steps))
+        # Inserting or updating the step count in the database
+        today_date = datetime.date.today()
+        cursor.execute(
+            """
+            INSERT INTO stepcount (user_id, stepcount, date, source) 
+            VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE stepcount = VALUES(stepcount), source = VALUES(source)
+            """,
+            (user_id, steps, today_date, 'fitbit')
+        )
 
-            # Commit changes to the database
-            connection.commit()
+        connection.commit()
+        cursor.close()
+        connection.close()
 
-        return {"message": "Steps data stored or updated", "steps": steps, "user_id": user_id}
+        logger.info(f"Steps data successfully stored for user {user_id}")
+        return {"message": "Steps data successfully fetched and stored.", "steps": steps}
 
     except Exception as e:
-        logger.error(f"Error in fetching or storing steps: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Function to check if the access token is valid
-def is_token_valid(access_token: str) -> bool:
-    """
-    Check if the access token is valid by making a simple API request.
-    """
-    headers = {
-        'Authorization': f'Bearer {access_token}'
-    }
-    fitbit_url = f'https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json'
-    fitbit_response = requests.get(fitbit_url, headers=headers)
-    return fitbit_response.status_code != 401
-
-# Function to refresh the access token using the refresh token
-async def refresh_access_token(refresh_token: str) -> str:
-    """
-    Refresh the access token using the refresh token.
-    """
-    payload = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'refresh_token': refresh_token,
-        'grant_type': 'refresh_token',
-    }
-
-    headers = {
-        'Authorization': f'Basic {base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()}'
-    }
-
-    response = requests.post(TOKEN_URL, data=payload, headers=headers)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Error refreshing access token")
-
-    new_access_token = response.json().get("access_token")
-    if not new_access_token:
-        raise HTTPException(status_code=400, detail="Failed to retrieve new access token")
-
-    return new_access_token
+        logger.error(f"Error fetching or storing Fitbit steps: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching or storing Fitbit steps: {str(e)}")
