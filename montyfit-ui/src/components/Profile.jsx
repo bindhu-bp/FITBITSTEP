@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "./Dashboard.module.css";
-import { getUserProfile, updateUserProfile } from "../services/profileService"; // Import the service file
-import ConnectFitbit from "./ConnectFitbit";
+import styles from "./Profile.module.css";
+import { getUserProfile, updateUserProfile } from "../services/profileService";
 
 export default function Profile({ userEmail, onLogout, userId }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -13,10 +12,7 @@ export default function Profile({ userEmail, onLogout, userId }) {
     address: "",
     profileImage: "",
   });
-
-  const handleEditClick = () => {
-    setIsEditing(!isEditing);
-  };
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -46,10 +42,21 @@ export default function Profile({ userEmail, onLogout, userId }) {
       } catch (error) {
         console.error(error);
       }
-    } else {
-      onLogout();
     }
     setIsEditing(!isEditing);
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const handleMenuOption = (option) => {
+    if (option === "Edit") {
+      setIsEditing(true);
+    } else if (option === "Logout") {
+      onLogout();
+    }
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -76,17 +83,38 @@ export default function Profile({ userEmail, onLogout, userId }) {
   return (
     <>
       <div className={styles.sidebar}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20px"
-          height="20px"
-          viewBox="0 0 24 24"
-          className={styles.editIcon}
-          onClick={handleEditClick}
-        >
-          <path d="M0 0h24v24H0z" fill="none" />
-          <path d="M20.71 7.04l-4.75-4.75a.996.996 0 0 0-1.41 0L2.29 14.29a1 1 0 0 0-.29.7V19a2 2 0 0 0 2 2h4.01c.26 0 .52-.1.71-.29l11.71-11.71a.996.996 0 0 0 0-1.41zm-4.32-.38L17 5.01l1.62 1.62-1.47 1.47-1.62-1.62zM7 17v-2.02l7.07-7.07 2.02 2.02L9.02 17H7z" />
-        </svg>
+        <div className={styles.hamburgerMenu} onClick={toggleMenu}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24px"
+            height="24px"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3 6h18M3 12h18M3 18h18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        </div>
+
+        {menuOpen && (
+          <div className={styles.menuOptions}>
+            <button
+              onClick={() => handleMenuOption("Edit")}
+              className={styles.menuButton}
+            >
+              Edit Profile
+            </button>
+            <button
+              onClick={() => handleMenuOption("Logout")}
+              className={styles.menuButton}
+            >
+              Logout
+            </button>
+          </div>
+        )}
 
         <div className={styles.profileSection}>
           <div className={styles.profilePhoto}>
@@ -111,42 +139,65 @@ export default function Profile({ userEmail, onLogout, userId }) {
           <div className={styles.userInfo}>
             {isEditing ? (
               <>
-                <input
-                  type="text"
-                  name="name"
-                  value={profileData.name}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, name: e.target.value })
-                  }
-                  className={styles.inputField}
-                />
-                <input
-                  type="text"
-                  name="role"
-                  value={profileData.role}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, role: e.target.value })
-                  }
-                  className={styles.inputField}
-                />
-                <input
-                  type="text"
-                  name="phone"
-                  value={profileData.phone}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, phone: e.target.value })
-                  }
-                  className={styles.inputField}
-                />
-                <input
-                  type="text"
-                  name="address"
-                  value={profileData.address}
-                  onChange={(e) =>
-                    setProfileData({ ...profileData, address: e.target.value })
-                  }
-                  className={styles.inputField}
-                />
+                <div className={styles.inputContainer}>
+                  <label className={styles.inputLabel} htmlFor="name">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profileData.name}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, name: e.target.value })
+                    }
+                    className={styles.inputField}
+                  />
+                </div>
+                <div className={styles.inputContainer}>
+                  <label className={styles.inputLabel} htmlFor="role">
+                    Role
+                  </label>
+                  <input
+                    type="text"
+                    name="role"
+                    value={profileData.role}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, role: e.target.value })
+                    }
+                    className={styles.inputField}
+                  />
+                </div>
+                <div className={styles.inputContainer}>
+                  <label className={styles.inputLabel} htmlFor="phone">
+                    Phone Number
+                  </label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={profileData.phone}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, phone: e.target.value })
+                    }
+                    className={styles.inputField}
+                  />
+                </div>
+                <div className={styles.inputContainer}>
+                  <label className={styles.inputLabel} htmlFor="address">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={profileData.address}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        address: e.target.value,
+                      })
+                    }
+                    className={styles.inputField}
+                  />
+                </div>
               </>
             ) : (
               <>
@@ -162,10 +213,11 @@ export default function Profile({ userEmail, onLogout, userId }) {
           </div>
         </div>
 
-        <button className={styles.logoutButton} onClick={handleSaveClick}>
-          {isEditing ? "Save" : "Logout"}
-        </button>
-        <ConnectFitbit userId={userId} />
+        {isEditing && (
+          <button className={styles.saveButton} onClick={handleSaveClick}>
+            Save
+          </button>
+        )}
       </div>
     </>
   );

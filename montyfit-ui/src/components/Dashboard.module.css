@@ -9,136 +9,15 @@ body {
 .dashboard {
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-}
-
-.sidebar {
-  width: 25%;
-  height: 84vh; /* Adjusted height to fit below titleBox */
-  border-radius: 15px;
-  background-color: white;
-  position: fixed;
-  top: 110px; /* Adjusted top to fit below titleBox */
-  left: 20px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  color: #000;
-  margin: 0;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.editIcon {
-  position: absolute;
-  top: 10px; /* Adjust top position */
-  right: 10px; /* Adjust right position */
-  width: 24px; /* Adjust icon width */
-  height: 24px; /* Adjust icon height */
-  fill: #000; /* Adjust icon color */
-  cursor: pointer;
-}
-
-.profileSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  position: relative; /* Added for positioning plus icon */
-}
-
-.profilePhoto {
-  width: 220px;
-  height: 220px;
-  background-color: #ddd;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  overflow: hidden;
-  position: relative; /* Added for positioning plus icon */
-}
-
-.profilePhoto img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.fileInput {
-  display: none;
-}
-
-.plusIcon {
-  position: absolute;
-  top: 160px;
-  right: 110px;
-  font-size: 20px;
-  color: black;
-  background-color: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.userInfo h2 {
-  margin: 0 0 10px 0;
-  width: 100%;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.userInfo {
-  text-align: center;
-  font-size: 15px;
-}
-
-.details p {
-  text-align: center;
-  margin: 10px 0;
-  padding: 10px 0;
-  font-weight: 500;
-  font-size: 17px;
-}
-
-.logoutButton {
-  padding: 10px 20px;
-  background-color: white;
-  width: 100%;
-  color: #000;
-  border: 1px solid #000;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.4s ease;
-}
-
-.logoutButton:hover {
-  background-color: #4281e4;
-}
-
-.inputField {
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid black;
-  color: #000;
-  border-radius: 5px;
-  width: 80%;
-  background-color: #fff;
 }
 
 .mainContent {
-  margin-left: 27vw;
+  margin-left: 28%;
   padding-top: 10px;
-  margin-top: 0;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 75%;
 }
 
 .stepcount {
@@ -187,6 +66,7 @@ body {
   background-color: #f79824;
   transition: background-color 0.4s ease;
   font-weight: 700;
+  margin-left: 100px;
 }
 
 /* .stepUpdate button:hover {

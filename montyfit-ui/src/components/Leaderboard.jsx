@@ -106,10 +106,7 @@ export default function Leaderboard() {
             >
               Daily
             </button>
-            <button
-              className={`${styles.weekly} ${view === "weekly" && "active"}`}
-              onClick={() => setView("weekly")}
-            >
+            <button className={styles.weekly} onClick={() => setView("weekly")}>
               Weekly
             </button>
           </div>
