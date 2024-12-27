@@ -1,0 +1,65 @@
+.titleBox {
+  width: 25%;
+  border-radius: 15px;
+  background-color: white;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  display: flex;
+  gap: 20px;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.title {
+  text-align: center;
+  font-size: 2em;
+  margin: 0;
+  color: #000;
+  font-family: "Noto Sans Japanese";
+}
+
+/* Media query for 1200px width */
+@media (max-width: 1200px) {
+  .titleBox {
+    width: 35%;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Media query for 1500px width */
+@media (max-width: 1560px) {
+  .titleBox {
+    width: 25%;
+    top: 15px;
+    left: 15px;
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 1.75em;
+  }
+
+  .logo {
+    width: 45px;
+    height: 45px;
+  }
+}

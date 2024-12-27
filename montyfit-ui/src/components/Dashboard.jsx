@@ -10,12 +10,12 @@ const Dashboard = ({ email, userId, onLogout }) => {
   return (
     <div className={styles.dashboard}>
       <Title />
-      <Profile userEmail={email} userId={userId} onLogout={onLogout} />
-      <div className={styles.mainContent}>
+      {/* <Profile userEmail={email} userId={userId} onLogout={onLogout} /> */}
+      {/* <div className={styles.mainContent}>
         <Stepcount userEmail={email} />
         <Charts userEmail={email} />
         <Leaderboard />
-      </div>
+      </div> */}
     </div>
   );
 };
