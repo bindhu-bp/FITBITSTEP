@@ -43,11 +43,15 @@ export default function Charts({ userEmail }) {
   };
 
   const chartDataWeekly = [["Date", "Steps"]];
-  responseData
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .forEach((day) => {
-      chartDataWeekly.push([day.date, parseInt(day.steps)]);
-    });
+  if (responseData.length === 0) {
+    chartDataWeekly.push(["No Data", 0]);
+  } else {
+    responseData
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .forEach((day) => {
+        chartDataWeekly.push([day.date, parseInt(day.steps)]);
+      });
+  }
 
   const chartOptionsWeekly = {
     title: "Weekly Chart",
